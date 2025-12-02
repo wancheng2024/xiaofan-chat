@@ -22,54 +22,142 @@
         .container {
             text-align: center;
             padding: 40px;
+            max-width: 400px;
+            width: 90%;
         }
-        .status {
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
+        .status-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .retry-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="status">
-            <div id="statusMessage">正在为您连接客服系统...</div>
+        <div class="status-box">
+            <div class="spinner"></div>
+            <div id="statusText">正在为您连接客服系统...</div>
+            <button id="retryBtn" class="retry-btn hidden" onclick="retryConnection()">重新连接</button>
         </div>
     </div>
 
-    <script type="text/javascript">
-        // 简化可靠的美洽初始化函数
-        function initMeiQia() {
-            // 加载美洽SDK
+    <script>
+        // 主要初始化函数
+        function initializeChat() {
+            console.log('开始初始化美洽客服系统...');
+            
+            // 检查是否已加载美洽SDK
+            if (typeof _MEIQIA === 'undefined') {
+                loadMeiQiaSDK();
+            } else {
+                startChat();
+            }
+        }
+        
+        // 加载美洽SDK
+        function loadMeiQiaSDK() {
             var script = document.createElement('script');
-            script.async = true;
-            script.charset = 'UTF-8';
             script.src = 'https://static.meiqia.com/widget/loader.js';
+            script.charset = 'UTF-8';
+            script.async = true;
             
             script.onload = function() {
-                // 设置企业ID
-                _MEIQIA('entId', 'b89e00c678ff516ca497668b179fe8d5');
-                // 隐藏浮动按钮
-                _MEIQIA('withoutBtn');
-                // 直接显示客服面板
-                _MEIQIA('showPanel', {
-                    greeting: '您好！'
-                });
-                
-                document.getElementById('statusMessage').textContent = '客服系统已就绪';
+                console.log('美洽SDK加载成功');
+                startChat();
             };
             
             script.onerror = function() {
-                document.getElementById('statusMessage').textContent = '加载失败，请刷新页面重试';
+                console.error('美洽SDK加载失败');
+                showError('网络连接失败，请检查网络后重试');
             };
             
             document.head.appendChild(script);
         }
         
-        // 页面加载后立即执行
-        window.addEventListener('DOMContentLoaded', function() {
-            initMeiQia();
+        // 启动聊天功能
+        function startChat() {
+            try {
+                // 设置企业ID
+                _MEIQIA('entId', 'b89e00c678ff516ca497668b179fe8d5');
+                // 隐藏浮动按钮
+                _MEIQIA('withoutBtn');
+                // 显示客服面板
+                _MEIQIA('showPanel', {
+                    greeting: '您好！请问有什么可以帮您？'
+                });
+                
+                console.log('客服系统启动成功');
+                document.getElementById('statusText').textContent = '客服系统已就绪';
+                
+                // 3秒后隐藏加载界面
+                setTimeout(function() {
+                    document.querySelector('.status-box').style.opacity = '0';
+                    setTimeout(function() {
+                        document.querySelector('.status-box').classList.add('hidden');
+                    }, 500);
+                }, 2000);
+                
+            } catch (error) {
+                console.error('启动客服系统失败:', error);
+                showError('客服系统启动失败，请刷新页面');
+            }
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            document.getElementById('statusText').textContent = message;
+            document.getElementById('retryBtn').classList.remove('hidden');
+            document.querySelector('.spinner').style.display = 'none';
+        }
+        
+        // 重新连接
+        function retryConnection() {
+            document.getElementById('statusText').textContent = '正在重新连接...';
+            document.getElementById('retryBtn').classList.add('hidden');
+            document.querySelector('.spinner').style.display = 'block';
+            
+            initializeChat();
+        }
+        
+        // 页面加载完成后立即执行
+        window.addEventListener('load', function() {
+            // 延迟1秒开始初始化，确保页面完全加载
+            setTimeout(initializeChat, 1000);
+            
+            // 10秒超时检测
+            setTimeout(function() {
+                if (!document.querySelector('.status-box').classList.contains('hidden')) {
+                    showError('连接超时，请点击重新连接');
+                }
+            }, 10000);
         });
     </script>
 </body>
