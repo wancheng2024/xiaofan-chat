@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xiaofan.chat - 在线客服办理窗口</title>
+    <title>ZLJR - 在线客服系统</title>
     <style>
         * {
             margin: 0;
@@ -39,36 +39,38 @@
             border-radius: 10px;
             margin: 20px 0;
         }
-        .loading {
-            color: #ffeb3b;
+        button {
+            padding: 15px 30px;
             font-size: 1.2em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .error {
-            color: #ff6b6b;
-            font-size: 1.1em;
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>xiaofan.chat</h1>
+        <h1>ZLJR</h1>
         <div class="subtitle">在线客服系统</div>
         
         <div class="status">
-            <div id="statusMessage" class="loading">正在加载客服系统...</div>
+            <div id="statusMessage">系统就绪，请点击按钮联系客服</div>
         </div>
         
-        <div id="manualTrigger" style="display: none;">
-            <button onclick="initMeiQia()" style="padding: 15px 30px; font-size: 1.2em; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                点击启动在线客服
-            </button>
-        </div>
+        <button onclick="initMeiQia()">联系在线客户</button>
     </div>
 
-    <!-- 美洽客服系统核心代码 -->
     <script type="text/javascript">
         function initMeiQia() {
-            console.log('正在初始化美洽客服系统...');
+            // 更新状态显示
+            document.getElementById('statusMessage').innerHTML = '正在启动客服系统...';
             
             // 美洽加载代码
             (function(m, ei, q, i, a, j, s) {
@@ -86,36 +88,14 @@
             // 设置企业ID
             _MEIQIA('entId', 'b89e00c678ff516ca497668b179fe8d5');
             
-            // 显示客服面板
+            // 显示客服面板 - 简化为"您好！"
             _MEIQIA('showPanel', {
-                greeting: '您好！欢迎咨询，请问有什么可以帮您？'
+                greeting: '您好！'
             });
             
             // 更新状态显示
             document.getElementById('statusMessage').innerHTML = '客服系统已启动！';
-            document.getElementById('statusMessage').className = '';
-            document.getElementById('manualTrigger').style.display = 'none';
-            
-            console.log('美洽客服系统初始化完成');
         }
-        
-        // 页面加载后自动尝试初始化
-        window.addEventListener('load', function() {
-            console.log('页面加载完成，准备初始化客服系统');
-            
-            // 先显示手动触发按钮，防止自动弹出被浏览器阻止
-            document.getElementById('manualTrigger').style.display = 'block';
-            document.getElementById('statusMessage').innerHTML = '系统就绪，请点击按钮启动客服';
-        });
-        
-        // 如果URL中有参数，自动初始化
-        setTimeout(function() {
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('entid')) {
-                console.log('检测到entid参数，自动初始化');
-                initMeiQia();
-            }
-        }, 1000);
     </script>
 </body>
 </html>
