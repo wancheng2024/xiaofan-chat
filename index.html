@@ -12,99 +12,65 @@
         }
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-        }
-        .loading-container {
-            text-align: center;
             color: white;
+        }
+        .container {
+            text-align: center;
             padding: 40px;
         }
-        .loading-text {
-            font-size: 1.2em;
-            margin-top: 20px;
-            opacity: 0.9;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top: 5px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .hidden {
-            display: none;
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
-    <!-- 加载提示页面 -->
-    <div class="loading-container" id="loadingScreen">
-        <div class="spinner"></div>
-        <div class="loading-text">正在为您连接客服系统...</div>
+    <div class="container">
+        <div class="status">
+            <div id="statusMessage">正在为您连接客服系统...</div>
+        </div>
     </div>
 
     <script type="text/javascript">
-        // 页面加载后立即初始化美洽客服
-        window.addEventListener('load', function() {
-            // 显示加载提示
-            document.getElementById('loadingScreen').style.display = 'flex';
+        // 简化可靠的美洽初始化函数
+        function initMeiQia() {
+            // 加载美洽SDK
+            var script = document.createElement('script');
+            script.async = true;
+            script.charset = 'UTF-8';
+            script.src = 'https://static.meiqia.com/widget/loader.js';
             
-            // 立即加载美洽客服系统
-            (function(m, ei, q, i, a, j, s) {
-                m[i] = m[i] || function() {
-                    (m[i].a = m[i].a || []).push(arguments);
-                };
-                j = ei.createElement(q);
-                s = ei.getElementsByTagName(q)[0];
-                j.async = true;
-                j.charset = 'UTF-8';
-                j.src = 'https://static.meiqia.com/widget/loader.js';
-                s.parentNode.insertBefore(j, s);
+            script.onload = function() {
+                // 设置企业ID
+                _MEIQIA('entId', 'b89e00c678ff516ca497668b179fe8d5');
+                // 隐藏浮动按钮
+                _MEIQIA('withoutBtn');
+                // 直接显示客服面板
+                _MEIQIA('showPanel', {
+                    greeting: '您好！'
+                });
                 
-                // SDK加载完成后立即初始化
-                j.onload = function() {
-                    // 设置企业ID
-                    _MEIQIA('entId', 'b89e00c678ff516ca497668b179fe8d5');
-                    
-                    // 直接显示客服面板（不显示浮动按钮）
-                    _MEIQIA('withoutBtn');
-                    _MEIQIA('showPanel', {
-                        greeting: '您好！欢迎咨询ZLJR，请问有什么可以帮您？'
-                    });
-                    
-                    // 隐藏加载提示
-                    document.getElementById('loadingScreen').style.display = 'none';
-                };
-            })(window, document, 'script', '_MEIQIA');
-        });
-        
-        // 备用方案：如果5秒内客服面板未弹出，显示提示
-        setTimeout(function() {
-            var loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen.style.display !== 'none') {
-                loadingScreen.innerHTML = '<div style="text-align:center;">' +
-                    '<div class="spinner"></div>' +
-                    '<div class="loading-text">正在连接，请稍候...</div>' +
-                    '<button onclick="retryInit()" style="margin-top:20px; padding:10px 20px; background:rgba(255,255,255,0.2); color:white; border:1px solid white; border-radius:5px; cursor:pointer;">重新连接</button>' +
-                    '</div>';
-            }
-        }, 5000);
-        
-        // 重新连接函数
-        function retryInit() {
-            location.reload();
+                document.getElementById('statusMessage').textContent = '客服系统已就绪';
+            };
+            
+            script.onerror = function() {
+                document.getElementById('statusMessage').textContent = '加载失败，请刷新页面重试';
+            };
+            
+            document.head.appendChild(script);
         }
+        
+        // 页面加载后立即执行
+        window.addEventListener('DOMContentLoaded', function() {
+            initMeiQia();
+        });
     </script>
 </body>
 </html>
