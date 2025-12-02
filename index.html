@@ -64,7 +64,8 @@
             <div id="statusMessage">系统就绪，请点击按钮联系客服</div>
         </div>
         
-        <button onclick="initMeiQia()">联系在线客户</button>
+        <!-- 修改后的按钮文字 -->
+        <button onclick="initMeiQia()">点击进入联系在线客服</button>
     </div>
 
     <script type="text/javascript">
@@ -88,7 +89,7 @@
             // 设置企业ID
             _MEIQIA('entId', 'b89e00c678ff516ca497668b179fe8d5');
             
-            // 显示客服面板 - 简化为"您好！"
+            // 显示客服面板
             _MEIQIA('showPanel', {
                 greeting: '您好！'
             });
